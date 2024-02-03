@@ -1,0 +1,54 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                  String     @id @default(uuid())
+  email               String     @unique
+  name                String?
+  password            String
+  isVerified          Boolean    @default(false)
+  resetPasswordToken  String?    @db.Text
+  resetPasswordExpire DateTime?
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime?  @updatedAt
+  MyFiles             File[]
+  SharedFiles         FileUser[]
+}
+
+model File {
+  id        String     @id @default(uuid())
+  name      String?
+  path      String
+  ownerId   String
+  owner     User       @relation(fields: [ownerId], references: [id])
+  createdAt DateTime   @default(now())
+  updatedAt DateTime?  @updatedAt
+  FileUsers FileUser[]
+}
+
+enum FileUserType {
+  OWNER
+  VIEWER
+}
+
+model FileUser {
+  id        String       @id @default(uuid())
+  fileId    String
+  file      File         @relation(fields: [fileId], references: [id])
+  userId    String
+  user      User         @relation(fields: [userId], references: [id])
+  type      FileUserType
+  createdAt DateTime     @default(now())
+  updatedAt DateTime?    @updatedAt
+
+  @@unique([fileId, userId])
+}
