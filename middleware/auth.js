@@ -38,7 +38,7 @@ const protectedMediaAuthentication = catchAsyncErrors(async (req, res, next) => 
       id
     },
     include: {
-      fileUsers: {
+      FileUsers: {
         where: {
           userId: req.user.id
         }
@@ -46,7 +46,7 @@ const protectedMediaAuthentication = catchAsyncErrors(async (req, res, next) => 
     }
   });
   if(!file) return next(new ErrorHandler(404, "File not found"));
-  if(file.fileUsers.length === 0) return next(new ErrorHandler(403, "You are not allowed to access this resource"));
+  if(file.FileUsers.length === 0) return next(new ErrorHandler(403, "You are not allowed to access this resource"));
   req.filePath = file.path;
   next();  
 });
